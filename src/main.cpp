@@ -1,3 +1,5 @@
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -8,7 +10,12 @@
 
 #include "Shader.hpp"
 
-unsigned int LoadTexture(const char* filepath)
+struct SpriteFrame
+{
+    float x, y, w, h;
+};
+
+unsigned int LoadTexture(const char* filepath, GLint wrapS = GL_CLAMP_TO_EDGE)
 {
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 4);
@@ -17,7 +24,7 @@ unsigned int LoadTexture(const char* filepath)
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -125,11 +132,26 @@ int main()
 
     stbi_set_flip_vertically_on_load(false);
 
-    auto characterTextureID   = LoadTexture("assets/textures/character_green_idle.png");
+    auto bgCloudsTextureID    = LoadTexture("assets/textures/background_clouds.png", GL_REPEAT);
+    auto bgTreesTextureID     = LoadTexture("assets/textures/background_color_trees.png", GL_REPEAT);
     auto blockMiddleTextureID = LoadTexture("assets/textures/terrain_grass_horizontal_middle.png");
     auto blockLeftTextureID   = LoadTexture("assets/textures/terrain_grass_horizontal_left.png");
     auto blockRightTextureID  = LoadTexture("assets/textures/terrain_grass_horizontal_right.png");
     auto coinTextureID        = LoadTexture("assets/textures/coin_gold.png");
+
+    auto characterTextureID = LoadTexture("assets/textures/spritesheet-characters-default.png");
+    const float sheetWidth  = 902.0f;
+    const float sheetHeight = 902.0f;
+
+    SpriteFrame frameIdle  = { 0.0f,   258.0f, 128.0f, 128.0f };
+    SpriteFrame frameJump  = { 129.0f, 258.0f, 128.0f, 128.0f };
+    SpriteFrame frameWalkA = { 258.0f, 258.0f, 128.0f, 128.0f };
+    SpriteFrame frameWalkB = { 387.0f, 258.0f, 128.0f, 128.0f };
+    SpriteFrame currentFrame = frameIdle;
+
+    float animTimer = 0.0f;
+    const float animSpeed = 0.15f;
+    int walkStep = 0;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -145,17 +167,9 @@ int main()
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            posX -= speed * deltaTime;
-            facingDirection = -1.0f;
-
-        }
-        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        {
-            posX += speed * deltaTime;
-            facingDirection = 1.0f;
-        }
+        float moveX = 0.0f;
+        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) moveX -= 1.0f;
+        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) moveX += 1.0f;
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && isGrounded)
         {
@@ -165,6 +179,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        posX += moveX * speed * deltaTime;
         velY += gravity * deltaTime;
         posY += velY * deltaTime;
 
@@ -176,6 +191,25 @@ int main()
             isGrounded = true;
         }
 
+        if (moveX != 0.0f)
+        {
+            facingDirection = moveX;
+            animTimer += deltaTime;
+            walkStep = (int)(animTimer / animSpeed) % 2;
+        }
+        else
+        {
+            animTimer = 0.0f;
+            walkStep = 0;
+        }
+
+        if (!isGrounded)
+            currentFrame = frameJump;
+        else if (moveX != 0)
+            currentFrame = (walkStep == 0) ? frameWalkA : frameWalkB;
+        else
+            currentFrame = frameIdle;
+
         float camX = posX - 400.0f;
         float camY = 186.0f;
 
@@ -184,7 +218,32 @@ int main()
 
         basicShader->Bind();
         basicShader->SetUniform1i("u_Texture", 0);
+        basicShader->SetUniform2f("u_UVScale", 1.0f, 1.0f);
+        basicShader->SetUniform2f("u_UVOffset", 0.0f, 0.0f);
         glBindVertexArray(VAO);
+
+        const float bgTileSize = 300.0f;
+        glBindTexture(GL_TEXTURE_2D, bgCloudsTextureID);
+        basicShader->SetUniform2f("u_UVScale", 800.0f / bgTileSize, 1.0f);
+        basicShader->SetUniform2f("u_UVOffset", (camX * 0.1f) / bgTileSize, 0.0f);
+
+        auto modelClouds = glm::mat4(1.0f);
+        modelClouds = glm::translate(modelClouds, glm::vec3(400.0f, 150.0f, 0.0f));
+        modelClouds = glm::scale(modelClouds, glm::vec3(800.0f, bgTileSize, 1.0f));
+        basicShader->SetUniformMat4f("u_MVP", proj * modelClouds);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindTexture(GL_TEXTURE_2D, bgTreesTextureID);
+        basicShader->SetUniform2f("u_UVOffset", (camX * 0.25f) / bgTileSize, 0.0f);
+
+        auto modelTrees = glm::mat4(1.0f);
+        modelTrees = glm::translate(modelTrees, glm::vec3(400.0f, 450.0f, 0.0f));
+        modelTrees = glm::scale(modelTrees, glm::vec3(800.0f, bgTileSize, 1.0f));
+        basicShader->SetUniformMat4f("u_MVP", proj * modelTrees);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        basicShader->SetUniform2f("u_UVScale", 1.0f, 1.0f);
+        basicShader->SetUniform2f("u_UVOffset", 0.0f, 0.0f);
 
         for (int i = -5; i < 15; i++)
         {
@@ -232,6 +291,8 @@ int main()
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
 
+        basicShader->SetUniform2f("u_UVScale", currentFrame.w / sheetWidth, currentFrame.h / sheetHeight);
+        basicShader->SetUniform2f("u_UVOffset", currentFrame.x / sheetWidth, currentFrame.y / sheetHeight);
         glBindTexture(GL_TEXTURE_2D, characterTextureID);
 
         auto model = glm::mat4(1.0f);

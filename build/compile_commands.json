@@ -1,0 +1,26 @@
+[
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\main.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\main.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/main.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\Shader.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\Shader.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/Shader.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/Shader.cpp.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\stb_image.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\stb_image.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/stb_image.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/stb_image.cpp.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\cc.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -o CMakeFiles\\main.dir\\src\\gl.c.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\gl.c",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/gl.c",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/gl.c.obj"
+}
+]
