@@ -22,5 +22,23 @@
   "command": "C:\\msys64\\ucrt64\\bin\\cc.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -o CMakeFiles\\main.dir\\src\\gl.c.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\gl.c",
   "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/gl.c",
   "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/gl.c.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\Window.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\Window.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/Window.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/Window.cpp.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\Texture2D.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\Texture2D.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/Texture2D.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/Texture2D.cpp.obj"
+},
+{
+  "directory": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DGLFW_DLL -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include -std=gnu++17 -o CMakeFiles\\main.dir\\src\\SpriteRenderer.cpp.obj -c C:\\Users\\Tomi\\Documents\\Programacion\\C++\\g-engine\\src\\SpriteRenderer.cpp",
+  "file": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/src/SpriteRenderer.cpp",
+  "output": "C:/Users/Tomi/Documents/Programacion/C++/g-engine/build/CMakeFiles/main.dir/src/SpriteRenderer.cpp.obj"
 }
 ]

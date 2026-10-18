@@ -18,6 +18,9 @@ add_executable(main
     src/Shader.cpp
     src/stb_image.cpp
     src/gl.c
+    src/Window.cpp
+    src/Texture2D.cpp
+    src/SpriteRenderer.cpp
 )
 
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/include)
