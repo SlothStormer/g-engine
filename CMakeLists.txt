@@ -21,6 +21,7 @@ add_executable(main
     src/Window.cpp
     src/Texture2D.cpp
     src/SpriteRenderer.cpp
+    src/Camara2D.cpp
 )
 
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/include)

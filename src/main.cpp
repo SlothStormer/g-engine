@@ -2,13 +2,22 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
+#include <vector>
 
+#include "Camara2D.hpp"
+#include "Physics.hpp"
 #include "Shader.hpp"
 #include "SpriteRenderer.hpp"
 #include "Texture2D.hpp"
 #include "Window.hpp"
+
+struct Block
+{
+    glm::vec2 pos;
+    glm::vec2 size;
+    Texture2D* texture;
+};
 
 int main()
 {
@@ -17,14 +26,14 @@ int main()
     auto basicShader = Shader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
     SpriteRenderer renderer(basicShader);
 
-    auto proj = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);
+    Camara2D cam(800.0f, 600.0f);
 
     float posX = 400.0f;
     float posY = 300.0f;
     float velY = 0.0f;
     float speed = 300.0f;
     const float gravity = 1200.0f;
-    const float jumpForce = -600.0f;
+    const float jumpForce = -650.0f;
     bool isGrounded = false;
     float facingDirection = 1.0f;
 
@@ -32,7 +41,7 @@ int main()
     float coinY = 450.0f;
     bool coinCollected = false;
 
-    float lastFrameTime = 0.0f;
+    double lastFrameTime = 0.0f;
 
     stbi_set_flip_vertically_on_load(false);
 
@@ -55,10 +64,27 @@ int main()
     const float animSpeed = 0.15f;
     int walkStep = 0;
 
+    std::vector<Block> blocks;
+
+    for(int i = -5; i < 15; i++)
+    {
+        Texture2D* tex = &blockMiddleTexture;
+        if (i == -5) tex = &blockLeftTexture;
+        else if (i == 14) tex = &blockRightTexture;
+
+        blocks.push_back({ {i * 64.0f, 568.0f}, {64.0f, 64.0f}, tex });
+    }
+
+    blocks.push_back({ {256.0f, 504.0f}, {64.0f, 64.0f}, &blockMiddleTexture });
+
+    blocks.push_back({ {448.0f, 350.0f}, {64.0f, 64.0f}, &blockLeftTexture });
+    blocks.push_back({ {512.0f, 350.0f}, {64.0f, 64.0f}, &blockMiddleTexture });
+    blocks.push_back({ {576.0f, 350.0f}, {64.0f, 64.0f}, &blockRightTexture });
+
     while(!w.shouldClose())
     {
-        float currentFrameTime = (float)w.getTime();
-        float deltaTime = currentFrameTime - lastFrameTime;
+        double currentFrameTime = w.getTime();
+        float deltaTime = (float)(currentFrameTime - lastFrameTime);
         lastFrameTime = currentFrameTime;
 
         w.pollEvents();
@@ -78,24 +104,66 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glm::vec2 playerHitbox = { 64.0f, 76.0f };
+        glm::vec2 hitboxOffset = { 0.0f, 12.0f };
+
         posX += moveX * speed * deltaTime;
+
+        for (const auto& block : blocks)
+        {
+            glm::vec2 colliderPos = { posX + hitboxOffset.x, posY + hitboxOffset.y };
+            glm::vec2 overlap = Physics::getOverlap({ colliderPos, playerHitbox }, { block.pos, block.size });
+
+            if (overlap.x > 0.0f && overlap.y > 0.0f)
+            {
+                if (moveX > 0.0f)
+                    posX -= overlap.x;
+                else if(moveX < 0.0f)
+                    posX += overlap.x;
+            }
+        }
+
         velY += gravity * deltaTime;
         posY += velY * deltaTime;
 
-        const float groundY = 486.0f;
-        if (posY >= groundY)
+        for (const auto& block : blocks)
         {
-            posY = groundY;
-            velY = 0.0f;
-            isGrounded = true;
+            glm::vec2 colliderPos = { posX + hitboxOffset.x, posY + hitboxOffset.y };
+            glm::vec2 overlap = Physics::getOverlap({ colliderPos, playerHitbox }, { block.pos, block.size });
+
+            if (overlap.x > 0.0f && overlap.y > 0.0f)
+            {
+                if (velY > 0.0f)
+                {
+                    posY -= overlap.y;
+                    velY = 0.0f;
+                }
+                else if (velY < 0.0f)
+                {
+                    posY += overlap.y;
+                    velY = 0.0f;
+                }
+            }
         }
 
-        if(!coinCollected)
+        isGrounded = false;
+        if (velY >= 0.0f)
         {
-            bool overlapX = std::abs(posX - coinX) < (60.0f / 2.0f + 40.0f / 2.0f);
-            bool overlapY = std::abs(posY - coinY) < (60.0f / 2.0f + 40.0f / 2.0f);
+            glm::vec2 feetPos = { posX + hitboxOffset.x, posY + hitboxOffset.y + 1.0f };
+            for (const auto& block : blocks)
+            {
+                if (Physics::checkOverlap({ feetPos, playerHitbox }, { block.pos, block.size }))
+                {
+                    isGrounded = true;
+                    break;
+                }
+            }
+        }
 
-            if(overlapX && overlapY)
+        if (!coinCollected)
+        {
+            glm::vec2 colliderPos = { posX + hitboxOffset.x, posY + hitboxOffset.y };
+            if (Physics::checkOverlap({ colliderPos, playerHitbox }, { {coinX, coinY}, {40.0f, 40.0f} }))
             {
                 coinCollected = true;
                 std::cout << "Moneda recogida!" << std::endl;
@@ -121,47 +189,39 @@ int main()
         else
             currentFrame = frameIdle;
 
-        float camX = posX - 400.0f;
-        float camY = 186.0f;
+        // Drawing
+        cam.setCenter({posX, 486.0f});
+        renderer.begin(cam.getProjection());
 
-        auto view = glm::translate(glm::mat4(1.0f), glm::vec3(-camX, -camY, 0.0f));
-        auto vp   = proj * view;
-
-        renderer.begin(proj);
-
+        // Background
         const float bgTileSize = 300.0f;
         renderer.draw(bgCloudsTexture,
                       {400.0f, 150.0f},
                       {800.0f, bgTileSize},
-                      {(camX * 0.1f) / bgTileSize, 0.0f},
+                      {(cam.getPosition().x * 0.1f) / bgTileSize, 0.0f},
                       {800.0f / bgTileSize, 1.0f});
 
         renderer.draw(bgTreesTexture,
                       {400.0f, 450.0f},
                       {800.0f, bgTileSize},
-                      {(camX * 0.25f) / bgTileSize, 0.0f},
+                      {(cam.getPosition().x * 0.25f) / bgTileSize, 0.0f},
                       {800.0f / bgTileSize, 1.0f});
 
-        renderer.begin(vp);
+        renderer.begin(cam.getViewProjection());
 
-        for (int i = -5; i < 15; i++)
+        // Platforms
+        for (const auto& block : blocks)
         {
-            float blockX = i * 64.0f;
-            float blockY = 568.0f;
-
-            if(i == -5)
-                 renderer.draw(blockLeftTexture, {blockX, blockY}, {64.0f, 64.0f});
-            else if(i == 14)
-                renderer.draw(blockRightTexture, {blockX, blockY}, {64.0f, 64.0f});
-            else
-                renderer.draw(blockMiddleTexture, {blockX, blockY}, {64.0f, 64.0f});
+            renderer.draw(*block.texture, block.pos, block.size);
         }
 
+        // Coin
         if(!coinCollected)
         {
             renderer.draw(coinTexture, {coinX, coinY}, {48.0f, 48.0f});
         }
 
+        // Player
         renderer.drawFrame(characterTexture, currentFrame, {posX, posY}, {100.0f  * facingDirection, 100.0f});
 
         w.swapBuffers();

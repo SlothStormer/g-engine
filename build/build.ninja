@@ -106,6 +106,15 @@ build CMakeFiles/main.dir/src/SpriteRenderer.cpp.obj: CXX_COMPILER__main_unscann
   OBJECT_FILE_DIR = CMakeFiles\main.dir\src
   TARGET_SUPPORT_DIR = CMakeFiles\main.dir
 
+build CMakeFiles/main.dir/src/Camara2D.cpp.obj: CXX_COMPILER__main_unscanned_ C$:/Users/Tomi/Documents/Programacion/C++/g-engine/src/Camara2D.cpp || cmake_object_order_depends_target_main
+  DEFINES = -DGLFW_DLL
+  DEP_FILE = CMakeFiles\main.dir\src\Camara2D.cpp.obj.d
+  FLAGS = -std=gnu++17
+  INCLUDES = -IC:/Users/Tomi/Documents/Programacion/C++/g-engine/include
+  OBJECT_DIR = CMakeFiles\main.dir
+  OBJECT_FILE_DIR = CMakeFiles\main.dir\src
+  TARGET_SUPPORT_DIR = CMakeFiles\main.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target main
@@ -114,7 +123,7 @@ build CMakeFiles/main.dir/src/SpriteRenderer.cpp.obj: CXX_COMPILER__main_unscann
 #############################################
 # Link the executable C:\Users\Tomi\Documents\Programacion\C++\g-engine\bin\main.exe
 
-build C$:/Users/Tomi/Documents/Programacion/C++/g-engine/bin/main.exe: CXX_EXECUTABLE_LINKER__main_ CMakeFiles/main.dir/src/main.cpp.obj CMakeFiles/main.dir/src/Shader.cpp.obj CMakeFiles/main.dir/src/stb_image.cpp.obj CMakeFiles/main.dir/src/gl.c.obj CMakeFiles/main.dir/src/Window.cpp.obj CMakeFiles/main.dir/src/Texture2D.cpp.obj CMakeFiles/main.dir/src/SpriteRenderer.cpp.obj | C$:/msys64/ucrt64/lib/libglfw3.dll.a
+build C$:/Users/Tomi/Documents/Programacion/C++/g-engine/bin/main.exe: CXX_EXECUTABLE_LINKER__main_ CMakeFiles/main.dir/src/main.cpp.obj CMakeFiles/main.dir/src/Shader.cpp.obj CMakeFiles/main.dir/src/stb_image.cpp.obj CMakeFiles/main.dir/src/gl.c.obj CMakeFiles/main.dir/src/Window.cpp.obj CMakeFiles/main.dir/src/Texture2D.cpp.obj CMakeFiles/main.dir/src/SpriteRenderer.cpp.obj CMakeFiles/main.dir/src/Camara2D.cpp.obj | C$:/msys64/ucrt64/lib/libglfw3.dll.a
   LINK_LIBRARIES = -lopengl32  C:/msys64/ucrt64/lib/libglfw3.dll.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\main.dir
   POST_BUILD = cd .
